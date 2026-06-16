@@ -166,3 +166,7 @@ Icon
 *.sln
 *.sw?
 *~
+
+
+dataset
+backup

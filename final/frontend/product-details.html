@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Congo Shop - Product Details</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description"
+    content="View product specifications, customer reviews, and real-time AI sentiment analysis reports on Congo Shop.">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- JS files -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Protect route
+    requireAuth();
+  </script>
+</head>
+
+<body class="min-h-screen bg-[#fffcf9] font-sans pb-16">
+
+  <!-- Shared Navbar Injected Here -->
+  <div id="navbar-container"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 animate-fade-in">
+    <!-- Back Button -->
+    <button id="back-btn"
+      class="flex items-center text-slate-500 hover:text-orange-500 mb-6 transition-colors font-semibold">
+      <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i> Back to Products
+    </button>
+
+    <!-- Page Loading State -->
+    <div id="page-loader" class="py-20 text-center text-orange-500 font-bold">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+      Loading product details...
+    </div>
+
+    <!-- Product Content (Hidden during load) -->
+    <div id="product-content" class="hidden">
+
+      <!-- Product Main Card -->
+      <div
+        class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-8 flex flex-col md:flex-row shadow-orange-500/5">
+        <div class="md:w-1/3 bg-[#f8f9fa] p-6 flex items-center justify-center">
+          <img id="product-image" src="" alt=""
+            class="w-full h-64 md:h-full object-contain max-h-[300px] mix-blend-multiply" />
+        </div>
+        <div class="p-8 md:w-2/3 flex flex-col justify-center">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span id="product-category"
+                class="text-xs font-bold uppercase tracking-wider text-orange-500 mb-1 block"></span>
+              <h1 id="product-name" class="text-3xl font-bold text-slate-800"></h1>
+            </div>
+            <span id="product-price" class="text-2xl font-bold text-slate-900"></span>
+          </div>
+          <p id="product-description" class="text-slate-500 mb-6 text-base leading-relaxed"></p>
+          <div class="flex items-center bg-orange-50 self-start px-3 py-1.5 rounded-xl">
+            <i data-lucide="star" class="w-4 h-4 text-orange-500 mr-2 fill-current"></i>
+            <span id="product-rating-badge" class="font-bold text-orange-700 text-sm">0 Average Rating</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Sentiment Analysis Section -->
+      <div id="ai-analysis-card"
+        class="hidden bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-8 p-8 shadow-orange-500/5">
+        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+          <i data-lucide="brain-circuit" class="w-6 h-6 text-orange-500 mr-2"></i>
+          Real-time AI Sentiment Analysis
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Left Col: Overall sentiment percentages -->
+          <div class="col-span-1">
+            <div class="text-sm font-semibold text-slate-500 uppercase mb-3">Overall Feedback</div>
+            <div class="flex flex-col space-y-4">
+              <div class="flex justify-between items-center bg-green-50 p-3 rounded-xl border border-green-100">
+                <span class="text-green-700 font-bold text-sm">Positive (4-5★)</span>
+                <span id="pct-positive" class="text-green-800 font-black">0%</span>
+              </div>
+              <div class="flex justify-between items-center bg-red-50 p-3 rounded-xl border border-red-100">
+                <span class="text-red-700 font-bold text-sm">Negative (1-2★)</span>
+                <span id="pct-negative" class="text-red-800 font-black">0%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Col: Aspect sentiments -->
+          <div class="col-span-2">
+            <div class="text-sm font-semibold text-slate-500 uppercase mb-4">Aspect Sentiments</div>
+            <div id="aspects-container" class="space-y-5">
+              <!-- Dynamically populated aspect sliders -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Layout split: Reviews list (left) & Write review form (right) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <!-- Reviews List -->
+        <div>
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">Customer Reviews</h2>
+            <div class="flex space-x-3">
+              <select id="filter-rating"
+                class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <option value="0">All Ratings</option>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+              </select>
+
+              <select id="sort-by"
+                class="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="highest">Highest</option>
+                <option value="lowest">Lowest</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Reviews cards stack -->
+          <div id="reviews-list-container" class="space-y-4">
+            <!-- Dynamically populated review items -->
+          </div>
+
+          <!-- Pagination -->
+          <div id="pagination-container"
+            class="hidden flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
+            <button id="prev-page-btn"
+              class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-sm font-semibold text-slate-700 shadow-sm disabled:opacity-50">
+              Previous
+            </button>
+            <span id="page-indicator" class="text-sm font-semibold text-slate-500">
+              Page 1 of 1
+            </span>
+            <button id="next-page-btn"
+              class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-sm font-semibold text-slate-700 shadow-sm disabled:opacity-50">
+              Next
+            </button>
+          </div>
+        </div>
+
+        <!-- Add Review Form (Right side, sticky) -->
+        <div>
+          <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm sticky top-24 shadow-orange-500/5">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Write a Review</h3>
+            <form id="add-review-form">
+
+              <!-- Star selector -->
+              <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Rating</label>
+                <div class="flex space-x-2" id="star-selector-container">
+                  <button type="button" data-score="1"
+                    class="star-select-btn focus:outline-none transition-transform active:scale-95">
+                    <i data-lucide="star" class="w-8 h-8 text-orange-500 fill-current"></i>
+                  </button>
+                  <button type="button" data-score="2"
+                    class="star-select-btn focus:outline-none transition-transform active:scale-95">
+                    <i data-lucide="star" class="w-8 h-8 text-orange-500 fill-current"></i>
+                  </button>
+                  <button type="button" data-score="3"
+                    class="star-select-btn focus:outline-none transition-transform active:scale-95">
+                    <i data-lucide="star" class="w-8 h-8 text-orange-500 fill-current"></i>
+                  </button>
+                  <button type="button" data-score="4"
+                    class="star-select-btn focus:outline-none transition-transform active:scale-95">
+                    <i data-lucide="star" class="w-8 h-8 text-orange-500 fill-current"></i>
+                  </button>
+                  <button type="button" data-score="5"
+                    class="star-select-btn focus:outline-none transition-transform active:scale-95">
+                    <i data-lucide="star" class="w-8 h-8 text-orange-500 fill-current"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Content textarea -->
+              <div class="mb-6">
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Your Review</label>
+                <textarea id="review-text-input" rows="4"
+                  class="w-full px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:outline-none transition-all resize-none text-sm"
+                  placeholder="What did you think about this product?" required></textarea>
+              </div>
+
+              <button type="submit" id="btn-submit-review"
+                class="w-full bg-orange-500 text-white font-bold py-3.5 rounded-xl hover:bg-orange-600 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 flex items-center justify-center transition-colors shadow-lg shadow-orange-500/10 disabled:opacity-70 active:scale-95">
+                <i data-lucide="send" class="w-4 h-4 mr-2"></i> Submit Review
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- AI Analysis Modal Overlay -->
+  <div id="analysis-modal"
+    class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+    <div
+      class="bg-white rounded-3xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 transform transition-all animate-fade-in">
+      <div class="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-5 flex justify-between items-center">
+        <h3 class="text-lg font-bold text-white flex items-center">
+          <i data-lucide="brain-circuit" class="w-5 h-5 mr-2"></i> AI Review Analysis
+        </h3>
+        <button id="close-modal-btn" class="text-white/80 hover:text-white text-2xl leading-none">&times;</button>
+      </div>
+
+      <div class="p-6">
+        <!-- Review text snippet -->
+        <div class="mb-6 p-4 bg-[#fffcf9] rounded-2xl border border-orange-100">
+          <p id="modal-review-text" class="text-slate-700 italic text-sm leading-relaxed"></p>
+          <div id="modal-review-author" class="mt-3 text-xs font-bold text-orange-600"></div>
+        </div>
+
+        <!-- Analysis loading state -->
+        <div id="modal-loader" class="hidden p-6 bg-slate-50 rounded-xl text-center border border-slate-100">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto mb-3"></div>
+          <p class="text-slate-500 text-sm font-semibold animate-pulse">Running live AI analysis...</p>
+        </div>
+
+        <!-- Analysis results container -->
+        <div id="modal-analysis-content" class="space-y-3">
+          <!-- Sentiment -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-[#fdfdfd] border border-slate-100">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Sentiment</span>
+            <span id="modal-sentiment-badge"
+              class="px-3 py-1 rounded-full text-xs font-bold bg-slate-50 text-slate-700"></span>
+          </div>
+
+          <!-- Does Recommend -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-[#fdfdfd] border border-slate-100">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Recommendation</span>
+            <div class="flex items-center" id="modal-recommend-box">
+              <!-- Recommends / Does not recommend icon + text -->
+            </div>
+          </div>
+
+          <!-- AI Generated -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-[#fdfdfd] border border-slate-100">
+            <span class="text-xs font-semibold text-slate-500 uppercase">AI Generated</span>
+            <div class="flex items-center" id="modal-ai-box">
+              <!-- AI generated warning -->
+            </div>
+          </div>
+
+          <!-- Authenticity -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-[#fdfdfd] border border-slate-100">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Authenticity</span>
+            <div class="flex items-center" id="modal-authentic-box">
+              <!-- fake review indicators -->
+            </div>
+          </div>
+
+          <!-- Matches Product -->
+          <div class="flex items-center justify-between p-3 rounded-xl bg-[#fdfdfd] border border-slate-100"
+            id="modal-match-row">
+            <span class="text-xs font-semibold text-slate-500 uppercase">Matches Product</span>
+            <div class="flex items-center" id="modal-match-box">
+              <!-- matches product details -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#fffcf9] px-6 py-4 border-t border-slate-100">
+        <button id="close-modal-bottom-btn"
+          class="w-full bg-white border border-slate-200 text-slate-700 font-bold py-2.5 rounded-xl hover:bg-slate-50 transition-colors text-sm">
+          Close Analysis
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lucide Icons & Shared Navbar scripts -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/navbar.js"></script>
+
+  <!-- Product Details Controller -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Parse query param id
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      if (!productId) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // DOM Elements
+      const backBtn = document.getElementById('back-btn');
+      const pageLoader = document.getElementById('page-loader');
+      const productContent = document.getElementById('product-content');
+
+      const pImage = document.getElementById('product-image');
+      const pCategory = document.getElementById('product-category');
+      const pName = document.getElementById('product-name');
+      const pPrice = document.getElementById('product-price');
+      const pDescription = document.getElementById('product-description');
+      const pRatingBadge = document.getElementById('product-rating-badge');
+
+      const aiCard = document.getElementById('ai-analysis-card');
+      const pctPositive = document.getElementById('pct-positive');
+      const pctNegative = document.getElementById('pct-negative');
+      const aspectsContainer = document.getElementById('aspects-container');
+
+      const reviewsContainer = document.getElementById('reviews-list-container');
+      const filterRating = document.getElementById('filter-rating');
+      const sortBySelect = document.getElementById('sort-by');
+      const paginationContainer = document.getElementById('pagination-container');
+      const prevPageBtn = document.getElementById('prev-page-btn');
+      const nextPageBtn = document.getElementById('next-page-btn');
+      const pageIndicator = document.getElementById('page-indicator');
+
+      const addReviewForm = document.getElementById('add-review-form');
+      const starSelector = document.getElementById('star-selector-container');
+      const reviewTextInput = document.getElementById('review-text-input');
+      const btnSubmitReview = document.getElementById('btn-submit-review');
+
+      // Modal elements
+      const analysisModal = document.getElementById('analysis-modal');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const closeModalBottomBtn = document.getElementById('close-modal-bottom-btn');
+      const modalReviewText = document.getElementById('modal-review-text');
+      const modalReviewAuthor = document.getElementById('modal-review-author');
+      const modalLoader = document.getElementById('modal-loader');
+      const modalContent = document.getElementById('modal-analysis-content');
+      const modalSentimentBadge = document.getElementById('modal-sentiment-badge');
+      const modalRecommendBox = document.getElementById('modal-recommend-box');
+      const modalAiBox = document.getElementById('modal-ai-box');
+      const modalAuthenticBox = document.getElementById('modal-authentic-box');
+      const modalMatchRow = document.getElementById('modal-match-row');
+      const modalMatchBox = document.getElementById('modal-match-box');
+
+      // State
+      let product = null;
+      let reviews = [];
+      let analysis = null;
+
+      let ratingFilterVal = 0;
+      let sortByVal = 'newest';
+      let pageVal = 1;
+      let totalPagesVal = 1;
+
+      let reviewRatingScore = 5;
+
+      // Bind Back Button
+      backBtn.addEventListener('click', () => {
+        // Safe navigation back or defaults to index.html
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+
+      // Load Product Info & Initial Reviews
+      initPage();
+
+      async function initPage() {
+        try {
+          await fetchProductDetails();
+          await fetchReviews();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          pageLoader.classList.add('hidden');
+          productContent.classList.remove('hidden');
+        }
+      }
+
+      async function fetchProductDetails() {
+        try {
+          const prodRes = await fetch(`${API_BASE}/products/${productId}`);
+          if (prodRes.ok) {
+            product = await prodRes.json();
+            renderProduct();
+          }
+
+          // Fetch sentiment summary analysis
+          const analysisRes = await fetch(`${API_BASE}/products/${productId}/analysis`);
+          if (analysisRes.ok) {
+            analysis = await analysisRes.json();
+            renderSentimentAnalysis();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      function renderProduct() {
+        pImage.src = product.image_url || product.image || 'https://via.placeholder.com/300';
+        pImage.alt = product.name;
+        pCategory.textContent = product.category;
+        pName.textContent = product.name;
+
+        const price = typeof product.price === 'number' ? product.price : parseFloat(product.price) || 0;
+        pPrice.textContent = `$${price.toFixed(2)}`;
+
+        pDescription.textContent = product.description;
+
+        const rating = product.average_rating || (analysis ? analysis.avg_rating : 0) || 0;
+        pRatingBadge.textContent = `${rating} Average Rating`;
+      }
+
+      function renderSentimentAnalysis() {
+        if (!analysis) return;
+        aiCard.classList.remove('hidden');
+
+        pctPositive.textContent = `${(analysis.pct_positive || 0).toFixed(1)}%`;
+        pctNegative.textContent = `${(analysis.pct_negative || 0).toFixed(1)}%`;
+
+        aspectsContainer.innerHTML = '';
+        const scores = analysis.aspect_scores || {};
+
+        Object.entries(scores).forEach(([aspect, score]) => {
+          const aspectRow = document.createElement('div');
+
+          let scoreText = 'Neutral';
+          let colorClass = 'text-slate-500';
+          if (score > 0.1) {
+            scoreText = 'Positive';
+            colorClass = 'text-green-600';
+          } else if (score < -0.1) {
+            scoreText = 'Negative';
+            colorClass = 'text-red-600';
+          }
+
+          const isPositive = score > 0;
+          const pctWidth = Math.abs(score) * 50;
+
+          aspectRow.innerHTML = `
+            <div class="flex justify-between text-xs font-bold text-slate-700 mb-1.5 capitalize">
+              <span>${aspect}</span>
+              <span class="${colorClass}">${scoreText}</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden flex relative">
+              <div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-200 z-10"></div>
+              ${isPositive
+              ? `<div class="h-3 bg-green-500 absolute left-1/2 transition-all duration-1000 animate-slide-in" style="width: ${pctWidth}%"></div>`
+              : `<div class="h-3 bg-red-500 absolute right-1/2 transition-all duration-1000 animate-slide-in" style="width: ${pctWidth}%"></div>`
+            }
+            </div>
+          `;
+          aspectsContainer.appendChild(aspectRow);
+        });
+      }
+
+      // Fetch Reviews list
+      async function fetchReviews() {
+        try {
+          const res = await fetch(`${API_BASE}/products/${productId}/reviews?rating=${ratingFilterVal}&sort_by=${sortByVal}&page=${pageVal}&limit=5`);
+          if (res.ok) {
+            const data = await res.json();
+            reviews = data.reviews || [];
+            totalPagesVal = data.pages || 1;
+            renderReviews();
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      function renderReviews() {
+        reviewsContainer.innerHTML = '';
+        if (reviews.length === 0) {
+          reviewsContainer.innerHTML = `<p class="text-slate-500 bg-white p-6 rounded-2xl border border-slate-100">No reviews yet. Be the first!</p>`;
+          paginationContainer.classList.add('hidden');
+          return;
+        }
+
+        reviews.forEach(review => {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md cursor-pointer transition-all hover:border-orange-300';
+
+          // Star rating icons html
+          let starsHtml = '';
+          for (let i = 0; i < 5; i++) {
+            const isFilled = i < review.rating;
+            starsHtml += `
+              <i data-lucide="star" class="w-3.5 h-3.5 ${isFilled ? 'text-orange-500 fill-current' : 'text-slate-200'}"></i>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="flex justify-between items-start mb-3">
+              <span class="font-bold text-slate-800 text-sm">${review.user_nickname}</span>
+              <div class="flex">
+                ${starsHtml}
+              </div>
+            </div>
+            <p class="text-slate-500 text-xs leading-relaxed line-clamp-3">${review.text}</p>
+            <div class="mt-4 text-xs text-orange-600 font-semibold flex items-center">
+              <i data-lucide="brain-circuit" class="w-3.5 h-3.5 mr-1"></i> Click to view AI Analysis
+            </div>
+          `;
+
+          // Handle details click
+          card.addEventListener('click', () => {
+            openReviewAnalysis(review);
+          });
+
+          reviewsContainer.appendChild(card);
+        });
+
+        // Pagination
+        if (totalPagesVal > 1) {
+          paginationContainer.classList.remove('hidden');
+          pageIndicator.textContent = `Page ${pageVal} of ${totalPagesVal}`;
+          prevPageBtn.disabled = pageVal === 1;
+          nextPageBtn.disabled = pageVal === totalPagesVal;
+        } else {
+          paginationContainer.classList.add('hidden');
+        }
+
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }
+
+      // Review Filters & Sorting Bindings
+      filterRating.addEventListener('change', (e) => {
+        ratingFilterVal = Number(e.target.value);
+        pageVal = 1;
+        fetchReviews();
+      });
+
+      sortBySelect.addEventListener('change', (e) => {
+        sortByVal = e.target.value;
+        pageVal = 1;
+        fetchReviews();
+      });
+
+      prevPageBtn.addEventListener('click', () => {
+        if (pageVal > 1) {
+          pageVal--;
+          fetchReviews();
+        }
+      });
+
+      nextPageBtn.addEventListener('click', () => {
+        if (pageVal < totalPagesVal) {
+          pageVal++;
+          fetchReviews();
+        }
+      });
+
+      // Submit Review Form Handlers
+      const starSelectBtns = document.querySelectorAll('.star-select-btn');
+      starSelector.addEventListener('click', (e) => {
+        const btn = e.target.closest('.star-select-btn');
+        if (!btn) return;
+
+        reviewRatingScore = Number(btn.getAttribute('data-score'));
+        renderStarSelectorState();
+      });
+
+      function renderStarSelectorState() {
+        starSelectBtns.forEach(btn => {
+          const score = Number(btn.getAttribute('data-score'));
+          const starIcon = btn.querySelector('i');
+
+          if (score <= reviewRatingScore) {
+            starIcon.className = 'w-8 h-8 text-orange-500 fill-current';
+          } else {
+            starIcon.className = 'w-8 h-8 text-slate-200';
+          }
+        });
+      }
+
+      addReviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = reviewTextInput.value.trim();
+        const nickname = getNickname();
+
+        if (!text || !nickname) return;
+
+        btnSubmitReview.disabled = true;
+        btnSubmitReview.innerHTML = `
+          <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+          Analyzing Review...
+        `;
+
+        try {
+          const res = await fetch(`${API_BASE}/products/${productId}/reviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_nickname: nickname,
+              rating: reviewRatingScore,
+              text: text
+            })
+          });
+
+          if (res.ok) {
+            reviewTextInput.value = '';
+            reviewRatingScore = 5;
+            renderStarSelectorState();
+
+            // Reload reviews list
+            fetchReviews();
+            // Reload overall details to refresh averages
+            fetchProductDetails();
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          btnSubmitReview.disabled = false;
+          btnSubmitReview.innerHTML = `<i data-lucide="send" class="w-4 h-4 mr-2"></i> Submit Review`;
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
+
+      // AI Analysis Modal Control
+      async function openReviewAnalysis(review) {
+        modalReviewText.textContent = `"${review.text}"`;
+        modalReviewAuthor.textContent = `- ${review.user_nickname}`;
+
+        analysisModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Lock scroll
+
+        if (review.analysis && review.analysis.sentiment) {
+          renderReviewAnalysisData(review.analysis);
+        } else {
+          modalContent.classList.add('hidden');
+          modalLoader.classList.remove('hidden');
+
+          try {
+            const res = await fetch(`${API_BASE}/reviews/${review.id}/analysis`);
+            if (!res.ok) throw new Error('Failed to fetch review analysis');
+            const analysisData = await res.json();
+            review.analysis = analysisData; // Cache it
+            renderReviewAnalysisData(analysisData);
+          } catch (e) {
+            console.error(e);
+            alert('Failed to run AI Analysis on this review');
+            closeModal();
+          } finally {
+            modalLoader.classList.add('hidden');
+          }
+        }
+      }
+
+      function renderReviewAnalysisData(data) {
+        modalContent.classList.remove('hidden');
+
+        // Sentiment badge
+        modalSentimentBadge.textContent = data.sentiment;
+        modalSentimentBadge.className = 'px-3 py-1 rounded-full text-xs font-bold ' +
+          (data.sentiment === 'Positive' ? 'bg-green-50 text-green-700' :
+            data.sentiment === 'Negative' ? 'bg-red-50 text-red-700' : 'bg-slate-50 text-slate-700');
+
+        // Recommendation
+        if (data.does_recommend) {
+          modalRecommendBox.innerHTML = `
+            <i data-lucide="thumbs-up" class="w-4 h-4 text-green-600 mr-2"></i>
+            <span class="text-green-700 text-xs font-bold">Recommends</span>
+          `;
+        } else {
+          modalRecommendBox.innerHTML = `
+            <i data-lucide="thumbs-down" class="w-4 h-4 text-red-600 mr-2"></i>
+            <span class="text-red-700 text-xs font-bold">Does Not Recommend</span>
+          `;
+        }
+
+        // AI Generated
+        if (data.written_using_ai) {
+          modalAiBox.innerHTML = `
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 mr-2 animate-bounce"></i>
+            <span class="text-amber-700 text-xs font-bold">Likely AI</span>
+          `;
+        } else {
+          modalAiBox.innerHTML = `
+            <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2"></i>
+            <span class="text-green-700 text-xs font-bold">Human Written</span>
+          `;
+        }
+
+        // Authenticity
+        if (data.is_fake_review) {
+          modalAuthenticBox.innerHTML = `
+            <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500 mr-2"></i>
+            <span class="text-red-700 text-xs font-bold">Flagged Fake</span>
+          `;
+        } else {
+          modalAuthenticBox.innerHTML = `
+            <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2"></i>
+            <span class="text-green-700 text-xs font-bold">Appears Authentic</span>
+          `;
+        }
+
+        // Matches product
+        if (data.matches_product !== null && data.matches_product !== undefined) {
+          modalMatchRow.classList.remove('hidden');
+          if (data.matches_product) {
+            modalMatchBox.innerHTML = `
+              <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mr-2"></i>
+              <span class="text-green-700 text-xs font-bold">Relevant</span>
+            `;
+          } else {
+            modalMatchBox.innerHTML = `
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500 mr-2"></i>
+              <span class="text-red-700 text-xs font-bold">Irrelevant Content</span>
+            `;
+          }
+        } else {
+          modalMatchRow.classList.add('hidden');
+        }
+
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }
+
+      function closeModal() {
+        analysisModal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Unlock scroll
+      }
+
+      closeModalBtn.addEventListener('click', closeModal);
+      closeModalBottomBtn.addEventListener('click', closeModal);
+      analysisModal.addEventListener('click', (e) => {
+        if (e.target === analysisModal) closeModal();
+      });
+    });
+  </script>
+</body>
+
+</html>

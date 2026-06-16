@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Congo Shop - About</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description"
+    content="Meet the team behind Congo Shop. Developed by Group Q for COMP8420 Natural Language Processing.">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- JS files -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Protect route
+    requireAuth();
+  </script>
+</head>
+
+<body class="min-h-screen bg-[#fffcf9] font-sans pb-16">
+
+  <!-- Shared Navbar Injected Here -->
+  <div id="navbar-container"></div>
+
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 animate-fade-in">
+
+    <!-- Title / Header -->
+    <div class="text-center mb-16">
+      <div
+        class="inline-flex items-center justify-center bg-orange-100 p-3.5 rounded-3xl text-orange-600 mb-4 shadow-sm">
+        <i data-lucide="users" class="w-8 h-8"></i>
+      </div>
+      <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight mb-4">About the Project</h1>
+      <p
+        class="text-slate-500 font-semibold text-sm uppercase tracking-wider bg-orange-50 px-4 py-1.5 rounded-full inline-block">
+        Made by Group Q
+      </p>
+    </div>
+
+    <!-- Project Description Card -->
+    <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm mb-12 relative overflow-hidden">
+      <div class="absolute right-0 top-0 w-32 h-32 bg-orange-500/5 rounded-full -mr-12 -mt-12"></div>
+
+      <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <i data-lucide="shield" class="w-5 h-5 text-orange-500"></i> COMP8420 - Congo Webshop: AI-Powered E-Commerce
+        Intelligence
+      </h2>
+      <p class="text-slate-500 leading-relaxed text-sm">
+        This E-commerce Intelligent System showcases the integration of modern natural language processing, semantic
+        search, and agentic design. By combining basic NLP techniques—such as text preprocessing, named entity
+        extraction, and TF-IDF recommendations—with advanced LLM features including ChromaDB-backed RAG, aspect-based
+        sentiment parsing, and Chain-of-Thought fake review detection, our team has built a premium, full-stack product
+        portal demonstrating how AI elevates contemporary e-commerce shopping and merchant analytics.
+
+      </p>
+    </div>
+
+    <!-- Meet Group Q -->
+    <div>
+      <h2 class="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+        <i data-lucide="award" class="w-6 h-6 text-orange-500"></i> Meet Group Q
+      </h2>
+
+      <div id="team-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <!-- Team members will be dynamically loaded -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Lucide Icons & Shared Navbar scripts -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/navbar.js"></script>
+
+  <!-- About Controller -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const teamGrid = document.getElementById('team-grid');
+
+      const members = [
+        { name: 'Ashon Shakya', role: 'Student ID: 45499756', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&q=80' },
+        { name: 'Aswin Pottekat Menon', role: 'Student ID: 48633844', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80' },
+        { name: 'Naseer Ahmed Syed', role: 'Student ID: 48005509', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&q=80' },
+        { name: 'Snigdha Patibandla', role: 'Student ID: 48448737', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&q=80' },
+        { name: 'MD Samiul Sahan', role: 'Student ID: 48634891', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&q=80' }
+      ];
+
+      renderTeam();
+
+      function renderTeam() {
+        teamGrid.innerHTML = '';
+        members.forEach(member => {
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col items-center text-center hover:shadow-lg transition-shadow duration-300';
+
+          card.innerHTML = `
+            <img
+              src="${member.avatar}"
+              alt="${member.name}"
+              class="w-20 h-20 rounded-2xl object-cover mb-4 shadow-inner ring-4 ring-orange-50"
+            />
+            <h3 class="font-bold text-slate-800 mb-1 text-base">${member.name}</h3>
+            <p class="text-slate-400 text-xs font-medium mb-4">${member.role}</p>
+          `;
+          teamGrid.appendChild(card);
+        });
+
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Congo Shop - Login</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Enter the Congo Shop portal to search premium electronics and view AI-powered sentiment analysis.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Auth JS -->
+  <script src="js/auth.js"></script>
+  <script>
+    // Protect route: Redirect to index.html if user is already logged in
+    requireAuth(true);
+  </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-[#1e0d00] via-[#3a1a00] to-[#0a0500] flex items-center justify-center p-4">
+
+  <main class="max-w-md w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl animate-fade-in" id="login-container">
+    <div class="flex justify-center mb-6">
+      <div class="w-16 h-16 bg-orange-500/10 border border-orange-500/30 rounded-2xl flex items-center justify-center">
+        <i data-lucide="sparkles" class="text-orange-500 w-8 h-8"></i>
+      </div>
+    </div>
+    
+    <h1 class="text-3xl font-bold text-white text-center mb-2">Welcome to Congo Shop</h1>
+    <p class="text-white/60 text-center mb-8 text-sm">Enter a nickname to enter the portal</p>
+    
+    <form id="login-form" class="space-y-6">
+      <div>
+        <label htmlFor="nickname" class="block text-xs font-semibold text-orange-200/80 uppercase tracking-wider mb-2">Nickname</label>
+        <input
+          type="text"
+          id="nickname"
+          class="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+          placeholder="e.g. CoffeeLover99"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        id="btn-login-submit"
+        class="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-3.5 rounded-xl hover:opacity-95 transition-opacity focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-stone-900 shadow-lg shadow-orange-500/20 active:scale-[0.98]"
+      >
+        Enter Portal
+      </button>
+    </form>
+  </main>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Form submission logic
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nicknameInput = document.getElementById('nickname');
+      const nicknameValue = nicknameInput.value.trim();
+      
+      if (nicknameValue) {
+        loginUser(nicknameValue);
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
